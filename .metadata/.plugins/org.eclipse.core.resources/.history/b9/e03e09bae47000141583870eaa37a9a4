@@ -1,0 +1,145 @@
+import java.awt.BorderLayout;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.PointerInfo;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+
+/**
+ * Runs and controls the program on the computer. Also creates and controls the GUI
+ * 
+ * @author Logan Tutt
+ *
+ */
+public class RobotGraphics implements MouseListener,MessageListener {
+
+	private final int DEFAULT_HEIGHT=500;
+	private final int DEFAULT_WIDTH=500;
+	private final int GRID_X_SIZE=5;
+	private final int GRID_Y_SIZE=9;
+	
+	private ComputerComs coms;
+	private DrawGrid grid;
+	private JFrame frame;
+	
+	public static void main(String args[]){
+
+		RobotGraphics gui=new RobotGraphics();
+		gui.go();
+	}
+	
+	
+	/**
+	 * constructor for RobotGraphics
+	 */
+	public RobotGraphics(){
+		coms= new ComputerComs();
+	}
+	
+	
+	/**
+	 * creates the window and runs the program
+	 */
+	public void go(){
+		frame = new JFrame("Robot Control");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+		grid = new DrawGrid(GRID_X_SIZE,GRID_Y_SIZE,1,1,0);
+		grid.addMouseListener(this);
+		JPanel gridPanel = new JPanel();
+		gridPanel.setLayout(new BorderLayout());
+		gridPanel.add(grid,BorderLayout.CENTER);
+		frame.add(grid);
+		frame.setVisible(true);
+		(new ReadThread(coms, this)).start();
+	}
+	
+	/**
+	 * runs when the mouse is clicked. calculates if an intersection was clicked and if one was it
+	 * sends those coords to the robot.
+	 * 
+	 * @param	e	the MouseEvent that called this method, used to get the component to check the loaction based on
+	 */
+	public void mouseClicked(MouseEvent e){
+		PointerInfo a=MouseInfo.getPointerInfo();
+		Point point = new Point(a.getLocation());
+		SwingUtilities.convertPointFromScreen(point, e.getComponent());
+		int x = (int)point.getX();
+		int y = (int)point.getY();
+		Rectangle r = e.getComponent().getBounds();
+		int width = r.width;
+		int height = r.height;
+		
+		int spacing;
+		if (width/GRID_X_SIZE<height/GRID_Y_SIZE){
+			spacing=width/GRID_X_SIZE;
+		}else
+			spacing = height/GRID_Y_SIZE;
+		
+		int xOffset =(width-spacing*(GRID_X_SIZE-1))/2;
+		int yOffset =(height-spacing*(GRID_Y_SIZE-1))/2;
+		if((((x-xOffset)%spacing<=spacing/3)||((x-xOffset)%spacing>=spacing*2/3))
+				&&(((y-yOffset)%spacing<=spacing/3)||((y-yOffset)%spacing>=spacing*2/3))){
+			int xCoord = 1+(int)(((x-xOffset)/(double)spacing)+.5);
+			int yCoord = 9-(int)(((y-yOffset)/(double)spacing)+.5);
+			if(xCoord>=1 && xCoord<=GRID_X_SIZE && yCoord>=1 && yCoord<=GRID_Y_SIZE){
+				for(int[] i:grid.getObjects()){
+					if(xCoord!=i[0]||yCoord!=i[1]){
+						System.out.println(xCoord + " "+yCoord);
+						coms.sendCoords(xCoord, yCoord);
+					}
+				}
+			}
+		}
+
+	}
+	
+	
+	/**
+	 * Updates the robot pose in the grid
+	 * 
+	 * @param	x	Current X location
+	 * @param	y	Current Y location
+	 * @param	heading	Current heading
+	 */
+	public void doRobotLocMessageAction(int x, int y, int heading){
+		System.out.println(x+" "+y+" "+heading);
+		grid.setRobotPose(x, y, heading);
+		frame.repaint();
+	}
+	
+	public void doObjectLocMessageAction(int x, int y) {
+		grid.addObject(x, y);
+		frame.repaint();
+	};
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+}

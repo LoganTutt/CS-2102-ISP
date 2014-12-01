@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy 6 elements to &apos;GridNavigator2/src&apos;&#x0D;&#x0A;- Original project: &apos;GridNavigator&apos;&#x0D;&#x0A;- Destination element: &apos;GridNavigator2/src&apos;&#x0D;&#x0A;- Original elements:&#x0D;&#x0A;     Comunicator.java&#x0D;&#x0A;     CrossListener.java&#x0D;&#x0A;     GridNavigator.java&#x0D;&#x0A;     LineTracker.java&#x0D;&#x0A;     Navigator.java&#x0D;&#x0A;     LineTrackSensor.java" description="Copy compilation units" destination="=GridNavigator2/src" element1="/src&lt;{Comunicator.java" element2="/src&lt;{CrossListener.java" element3="/src&lt;{GridNavigator.java" element4="/src&lt;{LineTracker.java" element5="/src&lt;{Navigator.java" element6="/src&lt;{LineTrackSensor.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1416255593261" units="6" version="1.0"/>
+</session>

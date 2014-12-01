@@ -1,0 +1,23 @@
+import java.io.IOException;
+
+
+public class ReadThread extends Thread {
+	
+	private ComputerComs coms;
+	private MessageListener listener;
+	
+	public ReadThread(ComputerComs c, MessageListener l){
+		coms = c;
+		listener=l;
+	}
+	
+	private void readInput(){
+		while(true){
+			try{
+				coms.
+			}catch(IOException e){
+				e.printStackTrace();
+			}
+		}
+	}
+}

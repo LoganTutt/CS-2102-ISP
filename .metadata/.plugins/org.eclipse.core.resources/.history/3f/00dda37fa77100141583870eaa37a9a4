@@ -1,0 +1,35 @@
+import lejos.hardware.lcd.LCD;
+import lejos.hardware.port.Port;
+import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3UltrasonicSensor;
+import lejos.robotics.SampleProvider;
+
+
+public class DistanceSensor {
+	
+	private SampleProvider sensor;
+	private final int CUTOFF_VALUE=50;
+	
+	public DistanceSensor(Port sensorPort){
+		sensor=(new EV3UltrasonicSensor(sensorPort)).getDistanceMode();
+	}
+	
+	public boolean inersectionBlocked(){
+		float[] values = new float[sensor.sampleSize()];
+		sensor.fetchSample(values, 0);
+		return values[0]*100<CUTOFF_VALUE;
+	}
+	
+	public float test(){
+		float[] values = new float[sensor.sampleSize()];
+		sensor.fetchSample(values, 0);
+		return values[0];
+	}
+	
+	public static void main(String args[]){
+		DistanceSensor d =new DistanceSensor(SensorPort.S4);
+		while(true){
+			LCD.drawString(""+d.test(), 0, 0);
+		}
+	}
+}

@@ -1,0 +1,70 @@
+import java.util.ArrayList;
+
+
+public class Node {
+	
+	private int x;
+	private int y;
+	private ArrayList<Node> neighbors;
+	private boolean isBlocked;
+	private boolean visited;
+	private int dist;
+	private Node previous;
+	
+	public Node(int xCoord, int yCoord){
+		x=xCoord;
+		y=yCoord;
+		neighbors = new ArrayList<Node>();
+		isBlocked=false;
+		dist = 0;
+	}
+	
+	public int getX(){
+		return x;
+	}
+	
+	public int getY(){
+		return y;
+	}
+	
+	public void addNeighbor(Node neighbor){
+		neighbors.add(neighbor);
+	}
+	
+	public ArrayList<Node> getNeighbors(){
+		return neighbors;
+	}
+	
+	public void setBlocked(boolean b){
+		isBlocked=b;
+	}
+	
+	public boolean isBlocked(){
+		return isBlocked;
+	}
+	
+	public void setDist(int d){
+		dist=d;
+	}
+	
+	public int getDist(){
+		return dist;
+	}
+	
+	public void setPrevious(Node n){
+		previous=n;
+	}
+	
+	public Node getPrevious(){
+		return previous;
+	}
+	
+	public void setVisited(boolean b){
+		visited=b;
+	}
+	
+	public boolean wasVisited(){
+		return visited;
+	}
+
+}

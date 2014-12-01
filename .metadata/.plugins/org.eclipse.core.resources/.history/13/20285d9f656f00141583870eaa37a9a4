@@ -1,0 +1,52 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+
+import javax.swing.JComponent;
+
+
+public class DrawGrid extends JComponent {
+	
+	private int gridXsize;
+	private int gridYsize;
+	
+	public DrawGrid(int gridXSize, int gridYSize){
+		gridXsize=gridXSize;
+		gridYsize=gridYSize;
+	}
+	
+	public void paintComponent(Graphics g){
+		Graphics2D g2 = (Graphics2D) g;
+		Rectangle r = this.getBounds();
+		int width = r.width;
+		int height = r.height;
+		
+		
+		int spacing;
+		if (width/gridXsize<height/gridYsize){
+			spacing=width/gridXsize;
+		}else
+			spacing = height/gridYsize;
+		
+		int xOffset =(width-spacing*(gridXsize-1))/2;
+		int yOffset =(height-spacing*(gridYsize-1))/2;
+		
+		for (int i = 0; i < gridXsize; i++) {
+			g2.drawLine(i * spacing + xOffset, yOffset, i * spacing + xOffset, height-yOffset);
+		}
+		for (int i = 0; i < gridYsize; i++) {
+			g2.drawLine(xOffset, i * spacing + yOffset, width-xOffset, i * spacing+yOffset);
+		}
+		
+		
+//		int xSpacing = width/gridXsize;
+//		int ySpacing = height/gridYsize;
+//		for(int i = 0; i<gridXsize;i++){
+//			g2.drawLine(i*xSpacing+xSpacing/2, 0, i*xSpacing+xSpacing/2, height);
+//		}
+//		for(int i = 0; i<gridYsize;i++){
+//			g2.drawLine(0,i*ySpacing+ySpacing/2, width,i*ySpacing+ySpacing/2);
+//		}
+		
+	}
+}

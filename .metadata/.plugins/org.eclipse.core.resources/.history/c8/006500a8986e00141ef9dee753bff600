@@ -1,0 +1,44 @@
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+
+public class ComputerControler {
+	
+	private Socket conection;
+	private InputStream in;
+	private OutputStream out;
+	
+	public static void main(String args[]){
+		
+		ComputerControler c;
+		try {
+			c = new ComputerControler();
+			while(true){
+				c.readInput();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+	}
+	
+	public ComputerControler() throws IOException{
+		ServerSocket socket = new ServerSocket(1111);
+		System.out.println("waiting for connection...");
+		conection=socket.accept();
+		System.out.println("conected");
+		in=conection.getInputStream();
+		out=conection.getOutputStream();
+	}
+	
+	public void readInput() throws IOException{
+		System.out.print("x=" + in.read());
+		System.out.println(" y=" + in.read());
+	}
+
+}

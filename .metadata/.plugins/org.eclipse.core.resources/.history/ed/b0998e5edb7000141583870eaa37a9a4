@@ -1,0 +1,38 @@
+
+public class GridNavigator implements CrossListener {
+
+	private Comunicator coms;
+	private Navigator n;
+	
+	public static void main(String[] args) {
+		GridNavigator g=new GridNavigator();
+		g.run();
+	}
+	
+	
+	/**
+	 * sends the current pose of the robot to the controller
+	 */
+	public void atCrossAction(){
+		coms.sendPose(n.getXChoord(), n.getYChoord(), n.getHeading());
+	}
+	
+	
+	/**
+	 * sets up all the robot functions and runs the program
+	 */
+	public void run(){
+		coms = new Comunicator();
+		n = new Navigator(1, 1, 0);
+		n.addListener(this);
+		while (true) {
+			int[] coords = { -1, -1 };
+			while (coords[0] == -1 || coords[1] == -1) {
+				coms.readMessage(coords);
+			}
+			n.moveTo(coords[0], coords[1]);
+		}
+	}
+	
+	
+}

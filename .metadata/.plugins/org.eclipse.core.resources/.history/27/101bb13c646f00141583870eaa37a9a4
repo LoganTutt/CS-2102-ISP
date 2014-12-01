@@ -1,0 +1,56 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+
+public class ComputerComs {
+	private Socket conection;
+	private DataInputStream in;
+	private DataOutputStream out;
+
+	public ComputerComs() {
+		try {
+			ServerSocket socket = new ServerSocket(1111);
+			System.out.println("waiting for connection...");
+			conection = socket.accept();
+			System.out.println("conected");
+			in = new DataInputStream(conection.getInputStream());
+			out = new DataOutputStream(conection.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void readInput(int[] i) {
+		// boolean isRobot = in.readInt()==0;
+		// System.out.print("x=" + in.readInt());
+		// System.out.print(" y=" + in.read());
+		// if(isRobot){
+		// System.out.println(" heading=" + in.readInt());
+		// }else{
+		// in.readInt();
+		// System.out.println();
+		// }
+		try {
+			i[0]=in.readInt();
+			i[1]=in.readInt();
+			i[2]=in.readInt();
+			i[3]=in.readInt();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void sendCoords(int x,int y){
+		try{
+		out.writeInt(x);
+		out.writeInt(y);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+
+}

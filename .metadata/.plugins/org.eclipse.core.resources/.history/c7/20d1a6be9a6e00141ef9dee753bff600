@@ -1,0 +1,57 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+
+public class ComputerControler {
+	
+	private Socket conection;
+	private DataInputStream in;
+	private DataOutputStream out;
+	
+	public static void main(String args[]){
+		
+		ComputerControler c;
+		try {
+			c = new ComputerControler();
+			while(true){
+				c.readInput();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		
+	}
+	
+	public ComputerControler() throws IOException{
+		ServerSocket socket = new ServerSocket(1111);
+		System.out.println("waiting for connection...");
+		conection=socket.accept();
+		System.out.println("conected");
+		in=new DataInputStream(conection.getInputStream());
+		out=new DataOutputStream(conection.getOutputStream());
+	}
+	
+	public void readInput() throws IOException{
+//		boolean isRobot = in.readInt()==0;
+//		System.out.print("x=" + in.readInt());
+//		System.out.print(" y=" + in.read());
+//		if(isRobot){
+//			System.out.println(" heading=" + in.readInt());
+//		}else{
+//			in.readInt();
+//			System.out.println();
+//		}
+		System.out.println(in.readInt());
+		System.out.println(in.readInt());
+		System.out.println(in.readInt());
+		System.out.println(in.readInt());
+	}
+
+}

@@ -1,0 +1,23 @@
+import javax.swing.JFrame;
+
+
+public class RobotGraphics {
+
+	private final int DEFAULT_HEIGHT=500;
+	private final int DEFAULT_WIDTH=500;
+	
+	public static void main(String args[]){
+		//ComputerComs coms= new ComputerComs();
+		RobotGraphics gui=new RobotGraphics();
+		gui.go();
+	}
+	
+	public void go(){
+		JFrame frame = new JFrame("Robot Control");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+		DrawGrid grid = new DrawGrid(5,9);
+		frame.add(grid);
+		frame.setVisible(true);
+	}
+}

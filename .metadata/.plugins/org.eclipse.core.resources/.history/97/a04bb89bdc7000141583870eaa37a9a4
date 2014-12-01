@@ -1,0 +1,64 @@
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+
+public class ComputerComs {
+	private Socket conection;
+	private DataInputStream in;
+	private DataOutputStream out;
+	
+	/**
+	 * Constructor for ComputerComs. Establishes the comunication  with the robot. This method 
+	 * will not finish until comunication has been established.
+	 */
+	public ComputerComs() {
+		try {
+			ServerSocket socket = new ServerSocket(1111);
+			System.out.println("waiting for connection...");
+			conection = socket.accept();
+			System.out.println("conected");
+			in = new DataInputStream(conection.getInputStream());
+			out = new DataOutputStream(conection.getOutputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Reads the input stream for data and stores any inputs in the array
+	 * 
+	 * @param i Array that inputed values will be stored in. Array should have 5 slots
+	 */
+	public void readInput(int[] i) {
+		try {
+			i[0]=in.readInt();
+			i[1]=in.readInt();
+			i[2]=in.readInt();
+			i[3]=in.readInt();
+			i[4]=1;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	
+	/**
+	 * Sends the desired coords to the robot
+	 * 
+	 * @param x Desired X coord
+	 * @param y Desired Y coord
+	 */
+	public void sendCoords(int x,int y){
+		try{
+		out.writeInt(x);
+		out.writeInt(y);
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+
+}

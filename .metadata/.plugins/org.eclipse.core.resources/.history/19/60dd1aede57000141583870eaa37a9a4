@@ -1,0 +1,165 @@
+import lejos.hardware.lcd.LCD;
+import lejos.hardware.port.MotorPort;
+import lejos.hardware.port.SensorPort;
+
+/**
+ * This object keeps track of the robot's current pose
+ * and will change it based on inputed commands
+ * 
+ * @author Logan Tutt
+ *
+ */
+public class Navigator {
+	
+	private int xPos;
+	private int yPos;
+	private int heading;
+	
+	private final int NORTH = 0;
+	private final int EAST = 90;
+	private final int SOUTH = 180;
+	private final int WEST = 270;
+	
+	private LineTracker robot;
+	private CrossListener listener=null;
+	
+	
+	/**
+	 * Constructor for Navigator
+	 * 
+	 * @param	startX	starting X coordinate
+	 * @param	startY	starting Y coordinate
+	 * @param	startHeading	starting heading of the robot
+	 */
+	public Navigator(int startX, int startY, int startHeading){
+		xPos=startX;
+		yPos=startY;
+		heading=startHeading;
+		robot = new LineTracker(MotorPort.B,MotorPort.C,SensorPort.S1,SensorPort.S3);
+		robot.calibrate();
+		robot.trackUntilCross();
+	};
+	
+	
+	/**
+	 * Moves the robot to the inputed coordinates. It moves
+	 * in the X direction first and then in the Y direction
+	 * 
+	 * @param	x	desired X coordinate
+	 * @param	y	desired Y coordinate
+	 */
+	public void moveTo(int x,int y){
+		
+		LCD.drawString("Going to: " + x +" " +y, 0, 0);
+		doCrossListenerAction();
+		if(x>xPos){
+			turnToHeading(EAST);
+		}else if(x<xPos){
+			turnToHeading(WEST);
+		}
+		while(x!=xPos){
+			robot.driveOverCross();
+			robot.trackUntilCross();
+			if(heading==EAST){
+				xPos++;
+			}else{
+				xPos--;
+			}
+			doCrossListenerAction();
+		}
+		
+		if(y>yPos){
+			turnToHeading(NORTH);
+		}else if(y<yPos){
+			turnToHeading(SOUTH);
+		}
+		while(y!=yPos){
+			robot.driveOverCross();
+			robot.trackUntilCross();
+			if(heading==NORTH){
+				yPos++;
+			}else{
+				yPos--;
+			}
+			doCrossListenerAction();
+		}
+		
+	}
+	
+	/**
+	 * returns the current X coord of the robot
+	 * 
+	 * @return	The current X coord of the robot
+	 */
+	public int getXCoord(){
+		return xPos;
+	}
+	
+	/**
+	 * returns the current Y coord of the robot
+	 * 
+	 * @return	The current Y coord of the robot
+	 */
+	public int getYCoord(){
+		return yPos;
+	}
+	
+	/**
+	 * returns the current heading of the robot
+	 * 
+	 * @return	The current heading of the robot
+	 */
+	public int getHeading(){
+		return heading;
+	}
+	
+	/**
+	 * Adds in the listener that will do actions if the robot is at a cross
+	 * 
+	 * @param c	The CrossListener that should be used when the robot is at a cross
+	 */
+	public void addListener(CrossListener c){
+		listener=c;
+	}
+	
+	/**
+	 * Runs the listener action if a listener has been added
+	 */
+	private void doCrossListenerAction(){
+		if(listener!=null){
+			listener.atCrossAction();
+		}
+	}
+	
+	private void doObjectSeenListenerAction(){
+		if(listener!=null){
+			listener.objectSeenAction();
+		}
+	}
+	
+	/**
+	 * turns the robot to the desired heading
+	 * 
+	 * @param	desiredHeading	heading the robot should turn to in degrees
+	 */
+	private void turnToHeading(int desiredHeading){
+		if(heading-desiredHeading==90||heading-desiredHeading==-270){
+			robot.turnLeft();
+			heading=(heading+270)%360;
+		}else if(Math.abs(heading-desiredHeading)==180){
+			robot.turnAround();
+			heading=(heading+180)%360;
+		}else if(heading-desiredHeading==-90||heading-desiredHeading==270){
+			robot.turnRight();
+			heading=(heading+90)%360;
+		}
+		doListenerAction();
+		LCD.drawString("Current Heading:"+ heading, 0, 5);
+	}
+
+
+	
+	
+	
+
+}

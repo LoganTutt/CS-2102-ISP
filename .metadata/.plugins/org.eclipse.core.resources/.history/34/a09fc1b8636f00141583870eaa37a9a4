@@ -1,0 +1,109 @@
+import java.awt.BorderLayout;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.PointerInfo;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
+
+public class RobotGraphics implements MouseListener {
+
+	private final int DEFAULT_HEIGHT=500;
+	private final int DEFAULT_WIDTH=500;
+	private final int GRID_X_SIZE=5;
+	private final int GRID_Y_SIZE=9;
+	
+	private ComputerComs coms;
+	
+	public static void main(String args[]){
+
+		RobotGraphics gui=new RobotGraphics();
+		gui.go();
+	}
+	
+	public RobotGraphics(){
+		//coms= new ComputerComs();
+	}
+	
+	public void go(){
+		JFrame frame = new JFrame("Robot Control");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+		DrawGrid grid = new DrawGrid(GRID_X_SIZE,GRID_Y_SIZE);
+		grid.addMouseListener(this);
+		JPanel gridPanel = new JPanel();
+		gridPanel.setLayout(new BorderLayout());
+		gridPanel.add(grid,BorderLayout.CENTER);
+		frame.add(grid);
+		//frame.pack();
+		frame.setVisible(true);
+	}
+	
+	public void mouseClicked(MouseEvent e){
+		PointerInfo a=MouseInfo.getPointerInfo();
+		Point point = new Point(a.getLocation());
+		SwingUtilities.convertPointFromScreen(point, e.getComponent());
+		int x = (int)point.getX();
+		int y = (int)point.getY();
+		Rectangle r = e.getComponent().getBounds();
+		int width = r.width;
+		int height = r.height;
+		
+		int spacing;
+		if (width/GRID_X_SIZE<height/GRID_Y_SIZE){
+			spacing=width/GRID_X_SIZE;
+		}else
+			spacing = height/GRID_Y_SIZE;
+		
+		int xOffset =(width-spacing*(GRID_X_SIZE-1))/2;
+		int yOffset =(height-spacing*(GRID_Y_SIZE-1))/2;
+		if((((x-xOffset)%spacing<=spacing/3)||((x-xOffset)%spacing>=spacing*2/3))
+				&&(((y-yOffset)%spacing<=spacing/3)||((y-yOffset)%spacing>=spacing*2/3))){
+			int xCoord = 1+(int)(((x-xOffset)/(double)spacing)+.5);
+			int yCoord = 9-(int)(((y-yOffset)/(double)spacing)+.5);
+			if(xCoord>=1 && xCoord<=GRID_X_SIZE && yCoord>=1 && yCoord<=GRID_Y_SIZE){
+				System.out.println(xCoord + " "+yCoord);
+				//coms.sendCoords(xCoord, yCoord);
+			}
+		}
+		
+//		int xSpacing = width/GRID_X_SIZE;
+//		int ySpacing = height/GRID_Y_SIZE;
+//		if((((x-xSpacing/2)%xSpacing<=xSpacing/3)||((x-xSpacing/2)%xSpacing>=xSpacing*2/3))&&(((y-ySpacing/2)%ySpacing<=ySpacing/3)||((y-ySpacing/2)%ySpacing>=ySpacing*2/3))){
+//			int xCoord = 1+(int)(((x-xSpacing/2)/(double)xSpacing)+.5);
+//			int yCoord = 1+(int)(((y-ySpacing/2)/(double)ySpacing)+.5);
+//			System.out.println(xCoord + " "+yCoord);
+//			//coms.sendCoords(xCoord, yCoord);
+//		}
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+}

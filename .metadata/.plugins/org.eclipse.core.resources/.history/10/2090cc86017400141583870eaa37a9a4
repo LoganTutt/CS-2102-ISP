@@ -1,0 +1,179 @@
+
+
+import lejos.hardware.lcd.LCD;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.hardware.port.Port;
+import lejos.robotics.RegulatedMotor;
+import lejos.robotics.navigation.DifferentialPilot;
+import lejos.utility.Delay;
+
+/**
+ * This object controls the robot directly and is able
+ * track the line and drive along it
+ * 
+ * @author Logan Tutt
+ *
+ */
+public class LineTracker {
+	
+	private final int baseSpeed = 180;
+	private final int pLineTracking=2;
+	
+	private LineTrackSensor sensor;
+	private RegulatedMotor leftMotor;
+	private RegulatedMotor rightMotor;
+	DifferentialPilot pilot;
+	
+	
+	/**
+	 * Constructor for LineTracker. Creates motor objects, a sensor object, and a DifferentialPilot
+	 * object 
+	 * 
+	 * @param	lMotor	port that left motor is on
+	 * @param	rMotor	port that right motor is on
+	 * @param	lSensor	port that left sensor is on
+	 * @param	rSensor	port that right sensor is on
+	 */
+	public LineTracker(Port lMotor,Port rMotor,Port lSensor,Port rSensor){
+		sensor= new LineTrackSensor(lSensor, rSensor);
+		leftMotor = new EV3LargeRegulatedMotor(lMotor);
+		rightMotor = new EV3LargeRegulatedMotor(rMotor);
+		pilot = new DifferentialPilot(56, 125, leftMotor, rightMotor);
+		
+	}
+
+	
+	/**
+	 * tracks the line until it reaches a cross
+	 */
+	public void trackUntilCross() {
+		while (!sensor.atCross()) {
+			trackLine();
+		}
+
+		setDrive(0, 0);
+	}
+	
+	
+	/**
+	 * Turns the robot around
+	 */
+	public void turnAround(){
+		driveOverCross();
+		pilot.setRotateSpeed(90);
+		//pilot.setTravelSpeed(80*baseSpeed/360);
+		//pilot.travel(40);
+		pilot.rotate(180);
+	}
+	
+	/**
+	 * Turns the robot 90 degrees left
+	 */
+	public void turnLeft(){
+		driveOverCross();
+		pilot.setRotateSpeed(90);
+		if (sensor.atCross()) {
+			pilot.setTravelSpeed(80 * baseSpeed / 360);
+			pilot.travel(40);
+		}
+		pilot.rotate(90);
+	}
+	
+	/**
+	 * turns the robot 90 degrees right
+	 */
+	public void turnRight(){
+		driveOverCross();
+		pilot.setRotateSpeed(90);
+		if(sensor.atCross()){
+			pilot.setTravelSpeed(80 * baseSpeed / 360);
+			pilot.travel(40);
+		}
+		pilot.rotate(-90);
+	}
+	
+	
+	/**
+	 * Calibrates the line sensor by oscillating back and forth over
+	 * the line.
+	 */
+	public void calibrate(){
+		leftMotor.rotate(-90,true);
+		rightMotor.rotate(90);
+		for(int i =0; i<2;i++){
+			leftMotor.rotate(180, true);
+			rightMotor.rotate(-180, true);
+			while(leftMotor.isMoving()){
+				sensor.calibrate();
+				Delay.msDelay(1);
+			}
+			leftMotor.rotate(-180, true);
+			rightMotor.rotate(180, true);
+			while(leftMotor.isMoving()){
+				sensor.calibrate();
+				Delay.msDelay(1);
+			}
+			
+		}
+		setDrive(baseSpeed,-baseSpeed);
+		while(sensor.getValue()<70);
+		setDrive(0,0);
+		LCD.drawString("Finished Calib", 0, 0);
+	}
+	
+	
+	/**
+	 * Robot drives forward until the robot is no longer
+	 * on a cross 
+	 */
+	public void driveOverCross(){
+		setDrive(baseSpeed,baseSpeed);
+		while(sensor.atCross()){}
+		setDrive(0,0);
+	}
+	
+	
+	/**
+	 * sets the left and right motors to the inputed speeds in deg/s. 
+	 * Negatives make the motors go in reverse
+	 * 
+	 * @param	left	speed of the left motor in deg/s
+	 * @param	right	speed of the right motor in deg/s
+	 */
+	private void setDrive(int left, int right) {
+		if (left == 0) {
+			leftMotor.flt(true);
+		} else {
+			leftMotor.setSpeed(Math.abs(left));
+			if(left>0){
+				leftMotor.forward();
+			}else{
+				leftMotor.backward();
+			}
+		}
+
+		if (right == 0) {
+			rightMotor.flt(true);
+		} else {
+			rightMotor.setSpeed(Math.abs(right));
+			if(right>0){
+				rightMotor.forward();
+			}else{
+				rightMotor.backward();
+			}
+		}
+	}
+	
+	
+	/**
+	 * sets the motors to speeds proportionally determined by
+	 * the location of the line under the robot.
+	 */
+	private void trackLine(){
+		int currentValue = sensor.getValue();
+		int leftDrive = baseSpeed + currentValue*pLineTracking;
+		int rightDrive = baseSpeed -currentValue*pLineTracking;
+		setDrive(leftDrive,rightDrive);
+	}
+	
+}

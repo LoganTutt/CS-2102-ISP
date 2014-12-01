@@ -1,0 +1,29 @@
+
+
+
+public class ReadThread extends Thread {
+	
+	private ComputerComs coms;
+	private MessageListener listener;
+	
+	public ReadThread(ComputerComs c, MessageListener l){
+		coms = c;
+		listener=l;
+	}
+	
+	public void run(){
+		while(true){
+				int[] values={-1,-1,-1,-1,-1};
+				coms.readInput(values);
+				if(values[4]==1){
+					switch(values[0]){
+					case 0:
+						listener.doRobotLocMessageAction(values[1],values[2],values[3]);
+					case 1:
+						listener.doObjectLocMessageAction(values[1], values[2]);
+					}
+
+				}
+		}
+	}
+}

@@ -1,0 +1,28 @@
+import java.io.IOException;
+
+
+public class ReadThread extends Thread {
+	
+	private ComputerComs coms;
+	private MessageListener listener;
+	
+	public ReadThread(ComputerComs c, MessageListener l){
+		coms = c;
+		listener=l;
+		readInputs();
+	}
+	
+	private void readInputs(){
+		while(true){
+				int[] values={-1,-1,-1,-1,-1};
+				coms.readInput(values);
+				if(values[4]==1){
+					switch(values[0]){
+					case 0:
+						listener.doRobotLocMessageAction(values[1],values[2],values[3]);
+					}
+
+				}
+		}
+	}
+}

@@ -1,0 +1,98 @@
+import java.util.ArrayList;
+
+
+public class Grid {
+
+	private ArrayList<Node> grid;
+	private int xSize;
+	private int ySize;
+	private CrossListener listener=null;
+
+	public Grid(int x, int y) {
+		xSize = x;
+		ySize = y;
+		grid = new ArrayList<Node>();
+		for (int i = 1; i <= ySize; i++) {
+			for (int j = 1; j <= xSize; j++) {
+				grid.add(new Node(j, i));
+			}
+		}
+		for (Node n : grid) {
+			for (Node m : grid) {
+				if ((Math.abs(m.getX() - n.getX()) == 1 || Math.abs(m.getX()
+						- n.getX()) == 0)
+						&& (Math.abs(m.getY() - n.getY()) == 1 || Math.abs(m
+								.getY() - n.getY()) == 0) && n != m && (Math.abs(m.getX() - n.getX())!=(Math.abs(m.getY() - n.getY())))) {
+					n.addNeighbor(m);
+				}
+			}
+		}
+		addBlockage(2, 2);
+		addBlockage(3, 2);
+		addBlockage(3, 7);
+	}
+	
+	public void addListener(CrossListener c){
+		listener=c;
+	}
+
+	public ArrayList<Node> getPath(int destX, int destY, int startX, int startY) {
+		Node startNode = null;
+		Node endNode = null;
+		for (Node n : grid) {
+			if (n.getX() == startX && n.getY() == startY) {
+				startNode = n;
+			}
+			if (n.getX() == destX && n.getY() == destY) {
+				endNode = n;
+			}
+			n.setDist(Integer.MAX_VALUE);
+			n.setPrevious(null);
+			n.setVisited(false);
+		}
+		startNode.setDist(0);
+		startNode.setVisited(true);
+		for (Node n : startNode.getNeighbors()) {
+			n.setDist(1);
+			n.setPrevious(startNode);
+		}
+		while (true) {
+			Node nodeToCheck = new Node(-1, -1);
+			nodeToCheck.setDist(Integer.MAX_VALUE);
+			for (Node n : grid) {
+				if (!n.isBlocked() && !n.wasVisited()
+						&& n.getDist() < nodeToCheck.getDist()) {
+					nodeToCheck = n;
+				}
+			}
+			if(nodeToCheck==endNode){
+				break;
+			}
+			for(Node n:nodeToCheck.getNeighbors()){
+				if(n.getDist()>nodeToCheck.getDist()+1){
+					n.setDist(nodeToCheck.getDist()+1);
+					n.setPrevious(nodeToCheck);
+				}
+			}
+			nodeToCheck.setVisited(true);
+		}
+		ArrayList<Node> path = new ArrayList<Node>();
+		path.add(endNode);
+		while(path.get(0).getPrevious()!=null){
+			path.add(0,path.get(0).getPrevious());
+		}
+		return path;
+	}
+	
+	public void addBlockage(int x, int y){
+		for(Node n: grid){
+			if(n.getX()==x&&n.getY()==y){
+				n.setBlocked(true);
+//				if(listener!=null){
+//					listener.objectSeenAction(x,y);
+//				}
+				return;
+			}
+		}
+	}
+}

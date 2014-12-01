@@ -1,0 +1,68 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.GeneralPath;
+
+import javax.swing.JComponent;
+
+
+public class DrawGrid extends JComponent {
+	
+	private int gridXsize;
+	private int gridYsize;
+	
+	private int robotXCoord;
+	private int robotYCoord;
+	private int robotHeading;
+	
+	private final int ROBOT_SCALE=10;
+	
+	public DrawGrid(int gridXSize, int gridYSize,int startX,int startY,int startHeading){
+		gridXsize=gridXSize;
+		gridYsize=gridYSize;
+		robotXCoord=startX-1;
+		robotYCoord=9-startY;
+		robotHeading=startHeading;
+	}
+	
+	public void paintComponent(Graphics g){
+		Graphics2D g2 = (Graphics2D) g;
+		Rectangle r = this.getBounds();
+		int width = r.width;
+		int height = r.height;
+		
+		
+		int spacing;
+		if (width/gridXsize<height/gridYsize){
+			spacing=width/gridXsize;
+		}else
+			spacing = height/gridYsize;
+		
+		int xOffset =(width-spacing*(gridXsize-1))/2;
+		int yOffset =(height-spacing*(gridYsize-1))/2;
+		
+		for (int i = 0; i < gridXsize; i++) {
+			g2.drawLine(i * spacing + xOffset, yOffset, i * spacing + xOffset, height-yOffset);
+		}
+		for (int i = 0; i < gridYsize; i++) {
+			g2.drawLine(xOffset, i * spacing + yOffset, width-xOffset, i * spacing+yOffset);
+		}
+		
+		
+		int robotXOrigin=xOffset+robotXCoord*spacing;
+		int robotYOrigin=yOffset+robotYCoord*spacing;
+		GeneralPath robot = new GeneralPath();
+		robot.moveTo(robotXOrigin+Math.sin(robotHeading*Math.PI/180)*ROBOT_SCALE,robotYOrigin-Math.cos(robotHeading*Math.PI/180)*ROBOT_SCALE);
+		robot.lineTo(robotXOrigin+Math.sin(((robotHeading+120)%360)*Math.PI/180)*ROBOT_SCALE, robotYOrigin-Math.cos(((robotHeading+120)%360)*Math.PI/180)*ROBOT_SCALE);
+		robot.lineTo(robotXOrigin+Math.sin(((robotHeading+180)%360)*Math.PI/180)*ROBOT_SCALE/4, robotYOrigin-Math.cos(((robotHeading+180)%360)*Math.PI/180)*ROBOT_SCALE/4);
+		robot.lineTo(robotXOrigin+Math.sin(((robotHeading+240)%360)*Math.PI/180)*ROBOT_SCALE, robotYOrigin-Math.cos(((robotHeading+240)%360)*Math.PI/180)*ROBOT_SCALE);
+		robot.closePath();
+		g2.draw(robot);
+	}
+	
+	public void setRobotPose(int x,int y,int heading){
+		robotXCoord=x-1;
+		robotYCoord=9-y;
+		robotHeading=heading;
+	}
+}

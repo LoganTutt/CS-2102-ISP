@@ -1,0 +1,32 @@
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+
+import javax.swing.JComponent;
+
+
+public class DrawGrid extends JComponent {
+	
+	private int gridXsize;
+	private int gridYsize;
+	private int width = 500;
+	private int height = 500;
+	
+	public DrawGrid(int gridXSize, int gridYSize){
+		gridXsize=gridXSize;
+		gridYsize=gridYSize;
+	}
+	
+	public void paintComponent(Graphics g){
+		Graphics2D g2 = (Graphics2D) g;
+		
+		int xSpacing = width/gridXsize;
+		int ySpacing = height/gridYsize;
+		for(int i = 0; i<gridXsize;i++){
+			g2.drawLine(i*xSpacing+xSpacing, 0, i*xSpacing+xSpacing/2, height);
+		}
+		for(int i = 0; i<gridYsize;i++){
+			g2.drawLine(0,i*ySpacing+ySpacing, width,i*ySpacing+ySpacing/2);
+		}
+		
+	}
+}
