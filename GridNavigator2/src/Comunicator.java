@@ -64,6 +64,13 @@ public class Comunicator {
 		sendMessage(Robot, x, y, heading);
 	}
 	
+	
+	/**
+	 * Sends the blockage location to the computer
+	 * 
+	 * @param x	Blockage X coord
+	 * @param y	Blockage Y coord
+	 */
 	public void sendObjectPose(int x,int y){
 		sendMessage(Object,x,y,-1);
 	}

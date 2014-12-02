@@ -82,6 +82,7 @@ public class RobotGraphics implements MouseListener,MessageListener {
 		}else
 			spacing = height/GRID_Y_SIZE;
 		
+		//checks if the click was close to an intersection
 		int xOffset =(width-spacing*(GRID_X_SIZE-1))/2;
 		int yOffset =(height-spacing*(GRID_Y_SIZE-1))/2;
 		if((((x-xOffset)%spacing<=spacing/3)||((x-xOffset)%spacing>=spacing*2/3))
@@ -90,12 +91,11 @@ public class RobotGraphics implements MouseListener,MessageListener {
 			int xCoord = 1+(int)(((x-xOffset)/(double)spacing)+.5);
 			int yCoord = 9-(int)(((y-yOffset)/(double)spacing)+.5);
 			if(xCoord>=1 && xCoord<=GRID_X_SIZE && yCoord>=1 && yCoord<=GRID_Y_SIZE){
-				for(int[] i:grid.getObjects()){
+				for(int[] i:grid.getObjects()){	//checks that the clicked intersection is not blocked
 					if(xCoord==i[0]&&yCoord==i[1]){
 						return;
 					}
-				}					
-				//System.out.println(xCoord + " "+yCoord);
+				}
 				coms.sendCoords(xCoord, yCoord);
 			}
 		}
@@ -111,7 +111,6 @@ public class RobotGraphics implements MouseListener,MessageListener {
 	 * @param	heading	Current heading
 	 */
 	public void doRobotLocMessageAction(int x, int y, int heading){
-		//System.out.println(x+" "+y+" "+heading);
 		grid.setRobotPose(x, y, heading);
 		frame.repaint();
 	}

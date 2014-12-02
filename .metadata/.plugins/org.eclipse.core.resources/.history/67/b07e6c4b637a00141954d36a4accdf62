@@ -1,0 +1,215 @@
+import java.util.ArrayList;
+
+import lejos.hardware.lcd.LCD;
+import lejos.hardware.port.MotorPort;
+import lejos.hardware.port.SensorPort;
+
+/**
+ * This object keeps track of the robot's current pose
+ * and will change it based on inputed commands
+ * 
+ * @author Logan Tutt
+ *
+ */
+public class Navigator {
+	
+	private int xPos;
+	private int yPos;
+	private int heading;
+	
+	private final int NORTH = 0;
+	private final int EAST = 90;
+	private final int SOUTH = 180;
+	private final int WEST = 270;
+	
+	private LineTracker robot;
+	private DistanceSensor distance;
+	private CrossListener listener=null;
+	private Grid grid;
+	private boolean blocked=false;
+	
+	/**
+	 * Constructor for Navigator
+	 * 
+	 * @param	startX	starting X coordinate
+	 * @param	startY	starting Y coordinate
+	 * @param	startHeading	starting heading of the robot
+	 */
+	public Navigator(int startX, int startY, int startHeading){
+		xPos=startX;
+		yPos=startY;
+		heading=startHeading;
+		robot = new LineTracker(MotorPort.B,MotorPort.C,SensorPort.S1,SensorPort.S3);
+		grid = new Grid(5,9);
+		distance=new DistanceSensor(SensorPort.S4);
+		robot.calibrate();
+		robot.trackUntilCross();
+		
+	};
+	
+	/**
+	 * moves to the designated coordinates avoiding obstacles
+	 * 
+	 * @param x	desired X coord
+	 * @param y	desired Y coord
+	 */
+	public void moveTo(int x, int y){
+		ArrayList<Node> path = grid.getPath(x, y, xPos, yPos);
+		if (path.size() > 0) {
+			for (Node n : path) {	//iterates through path. if blockage is discovered a new path is created and followed if possible
+				moveToNode(n);
+				if (blocked) {
+					break;
+				}
+			}
+			if (blocked) {
+				blocked = false;
+				moveTo(x, y);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Moves the robot to the inputed node. It moves
+	 * in the X direction first and then in the Y direction
+	 * 
+	 * @param	n	Node to move to
+	 */
+	private void moveToNode(Node n){
+		int x = n.getX();
+		int y = n.getY();
+		LCD.drawString("Going to: " + x +" " +y, 0, 0);
+		doCrossListenerAction();
+		if(x>xPos){	//turns to correct heading
+			turnToHeading(EAST);
+		}else if(x<xPos){
+			turnToHeading(WEST);
+		}
+		if(x!=xPos && distance.inersectionBlocked()){	//cancels move if a blockage is seen and reports blockage
+			blocked=true;
+			int blockageX=(int)(xPos+Math.sin(heading*Math.PI/180));
+			grid.addBlockage(blockageX,yPos);
+			doObjectSeenListenerAction(blockageX,yPos);
+			LCD.drawString(blockageX+" "+yPos, 8, 0);
+			return;
+		}
+		while(x!=xPos){	//does x movement and updates position
+			robot.driveOverCross();
+			robot.trackUntilCross();
+			if(heading==EAST){
+				xPos++;
+			}else{
+				xPos--;
+			}
+			doCrossListenerAction();
+		}
+		
+		if(y>yPos){	//turns to heading if needed
+			turnToHeading(NORTH);
+		}else if(y<yPos){
+			turnToHeading(SOUTH);
+		}
+		if(y!=yPos && distance.inersectionBlocked()){	//cancels move if a blockage is seen and reports blockage
+			blocked=true;
+			int blockageY=(int)(yPos+Math.cos(heading*Math.PI/180));
+			grid.addBlockage(xPos,blockageY);
+			doObjectSeenListenerAction(xPos,blockageY);
+			LCD.drawString(xPos+" "+blockageY, 7, 0);LCD.drawString("BLOCKED", 7, 0);
+			return;
+		}
+		
+		while(y!=yPos){	//moves in y direction and updates position
+			robot.driveOverCross();
+			robot.trackUntilCross();
+			if(heading==NORTH){
+				yPos++;
+			}else{
+				yPos--;
+			}
+			doCrossListenerAction();
+		}
+		
+	}
+	
+	/**
+	 * returns the current X coord of the robot
+	 * 
+	 * @return	The current X coord of the robot
+	 */
+	public int getXCoord(){
+		return xPos;
+	}
+	
+	/**
+	 * returns the current Y coord of the robot
+	 * 
+	 * @return	The current Y coord of the robot
+	 */
+	public int getYCoord(){
+		return yPos;
+	}
+	
+	/**
+	 * returns the current heading of the robot
+	 * 
+	 * @return	The current heading of the robot
+	 */
+	public int getHeading(){
+		return heading;
+	}
+	
+	/**
+	 * Adds in the listener that will do actions if the robot is at a cross
+	 * 
+	 * @param c	The CrossListener that should be used when the robot is at a cross
+	 */
+	public void addListener(CrossListener c){
+		listener=c;
+		//grid.addListener(c);
+	}
+	
+	/**
+	 * Runs the listener action if a listener has been added
+	 */
+	private void doCrossListenerAction(){
+		if(listener!=null){
+			listener.atCrossAction();
+		}
+	}
+	
+	/**
+	 * Runs the listener action if a listener has been added
+	 */
+	private void doObjectSeenListenerAction(int x, int y){
+		if(listener!=null){
+			listener.objectSeenAction(x,y);
+		}
+	}
+	
+	/**
+	 * turns the robot to the desired heading
+	 * 
+	 * @param	desiredHeading	heading the robot should turn to in degrees
+	 */
+	private void turnToHeading(int desiredHeading){
+		if(heading-desiredHeading==90||heading-desiredHeading==-270){
+			robot.turnLeft();
+			heading=(heading+270)%360;
+		}else if(Math.abs(heading-desiredHeading)==180){
+			robot.turnAround();
+			heading=(heading+180)%360;
+		}else if(heading-desiredHeading==-90||heading-desiredHeading==270){
+			robot.turnRight();
+			heading=(heading+90)%360;
+		}
+		doCrossListenerAction();
+		LCD.drawString("Current Heading:"+ heading, 0, 5);
+	}
+
+
+	
+	
+	
+
+}

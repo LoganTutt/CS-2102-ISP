@@ -74,14 +74,14 @@ public class DrawGrid extends JComponent {
 		int xOffset =(width-spacing*(gridXsize-1))/2;
 		int yOffset =(height-spacing*(gridYsize-1))/2;
 		
-		for (int i = 0; i < gridXsize; i++) {
+		for (int i = 0; i < gridXsize; i++) {	//draws the grid
 			g2.drawLine(i * spacing + xOffset, yOffset, i * spacing + xOffset, height-yOffset);
 		}
 		for (int i = 0; i < gridYsize; i++) {
 			g2.drawLine(xOffset, i * spacing + yOffset, width-xOffset, i * spacing+yOffset);
 		}
 		
-		int objectScaled =OBJECT_SCALE*spacing/BASE_GRID_SPACING;
+		int objectScaled =OBJECT_SCALE*spacing/BASE_GRID_SPACING;	//draws all blockages in the grid
 		g2.setColor(new Color(0,255,0));
 		if(objects.size()>0){
 			for(int[] i:objects){
@@ -89,6 +89,7 @@ public class DrawGrid extends JComponent {
 			}
 		}
 		
+		//draws the robot
 		int robotXOrigin=xOffset+robotXCoord*spacing;
 		int robotYOrigin=yOffset+robotYCoord*spacing;
 		int robotScaled = ROBOT_SCALE*spacing/BASE_GRID_SPACING;

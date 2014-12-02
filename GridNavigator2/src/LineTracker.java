@@ -61,8 +61,6 @@ public class LineTracker {
 	public void turnAround(){
 		driveOverCross();
 		pilot.setRotateSpeed(90);
-		//pilot.setTravelSpeed(80*baseSpeed/360);
-		//pilot.travel(40);
 		pilot.rotate(180);
 	}
 	

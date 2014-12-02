@@ -56,7 +56,7 @@ public class Navigator {
 	public void moveTo(int x, int y){
 		ArrayList<Node> path = grid.getPath(x, y, xPos, yPos);
 		if (path.size() > 0) {
-			for (Node n : path) {
+			for (Node n : path) {	//iterates through path. if blockage is discovered a new path is created and followed if possible
 				moveToNode(n);
 				if (blocked) {
 					break;
@@ -81,21 +81,20 @@ public class Navigator {
 		int y = n.getY();
 		LCD.drawString("Going to: " + x +" " +y, 0, 0);
 		doCrossListenerAction();
-		if(x>xPos){
+		if(x>xPos){	//turns to correct heading
 			turnToHeading(EAST);
 		}else if(x<xPos){
 			turnToHeading(WEST);
 		}
-		if(x!=xPos && distance.inersectionBlocked()){
+		if(x!=xPos && distance.inersectionBlocked()){	//cancels move if a blockage is seen and reports blockage
 			blocked=true;
 			int blockageX=(int)(xPos+Math.sin(heading*Math.PI/180));
-			//int blockageY=(int)(yPos+Math.cos(heading*Math.PI/180));
 			grid.addBlockage(blockageX,yPos);
 			doObjectSeenListenerAction(blockageX,yPos);
 			LCD.drawString(blockageX+" "+yPos, 8, 0);
 			return;
 		}
-		while(x!=xPos){
+		while(x!=xPos){	//does x movement and updates position
 			robot.driveOverCross();
 			robot.trackUntilCross();
 			if(heading==EAST){
@@ -106,21 +105,21 @@ public class Navigator {
 			doCrossListenerAction();
 		}
 		
-		if(y>yPos){
+		if(y>yPos){	//turns to heading if needed
 			turnToHeading(NORTH);
 		}else if(y<yPos){
 			turnToHeading(SOUTH);
 		}
-		if(y!=yPos && distance.inersectionBlocked()){
+		if(y!=yPos && distance.inersectionBlocked()){	//cancels move if a blockage is seen and reports blockage
 			blocked=true;
-			//int blockageX=(int)(xPos+Math.sin(heading*Math.PI/180));
 			int blockageY=(int)(yPos+Math.cos(heading*Math.PI/180));
 			grid.addBlockage(xPos,blockageY);
 			doObjectSeenListenerAction(xPos,blockageY);
 			LCD.drawString(xPos+" "+blockageY, 7, 0);LCD.drawString("BLOCKED", 7, 0);
 			return;
 		}
-		while(y!=yPos){
+		
+		while(y!=yPos){	//moves in y direction and updates position
 			robot.driveOverCross();
 			robot.trackUntilCross();
 			if(heading==NORTH){
@@ -167,7 +166,6 @@ public class Navigator {
 	 */
 	public void addListener(CrossListener c){
 		listener=c;
-		//grid.addListener(c);
 	}
 	
 	/**

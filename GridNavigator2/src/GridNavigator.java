@@ -23,6 +23,9 @@ public class GridNavigator implements CrossListener {
 		coms.sendPose(n.getXCoord(), n.getYCoord(), n.getHeading());
 	}
 	
+	/**
+	 * sends the location of the blockage
+	 */
 	public void objectSeenAction(int x,int y){
 		coms.sendObjectPose(x, y);
 	}
@@ -35,9 +38,6 @@ public class GridNavigator implements CrossListener {
 		coms = new Comunicator();
 		n = new Navigator(1, 1, 0);
 		n.addListener(this);
-//		coms.sendObjectPose(2, 2);
-//		coms.sendObjectPose(3, 2);
-//		coms.sendObjectPose(3, 7);
 		while (true) {
 			int[] coords = { -1, -1,-1 };
 			while (coords[2]!=1) {

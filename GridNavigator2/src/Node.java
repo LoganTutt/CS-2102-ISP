@@ -1,6 +1,11 @@
 import java.util.ArrayList;
 
-
+/**
+ * Represents one node in the grid
+ * 
+ * @author Logan Tutt
+ *
+ */
 public class Node {
 	
 	private int x;

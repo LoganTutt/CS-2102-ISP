@@ -26,8 +26,8 @@ public class ReadThread extends Thread {
 	
 	
 	/**
-	 * Continuously checks the input stream for incoming data, and runs the MessageListener method
-	 * if there is
+	 * Continuously checks the input stream for incoming data, and runs the apropriate 
+	 * MessageListener method if there is
 	 */
 	public void run(){
 		while(true){
